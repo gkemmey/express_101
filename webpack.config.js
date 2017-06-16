@@ -1,11 +1,10 @@
 const path = require("path");
 const webpack = require("webpack");
-// const ChunkManifestPlugin = require("chunk-manifest-webpack-plugin");
 const WebpackChunkHash = require("webpack-chunk-hash");
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 // possible flag for detecting production, not sure what i wanna do there yet
-// const prod = process.argv.indexOf('-p') !== -1;
+const packingForProduction = process.argv.indexOf('-p') !== -1;
 
 let config = {
   entry: {
@@ -15,8 +14,8 @@ let config = {
 
   output: {
     path: __dirname + "/public/",
-    filename: "javascripts/[name]_[chunkhash].js",
-    chunkFilename: "javascripts/[name]_[chunkhash].js"
+    filename:      packingForProduction ? "javascripts/[name]_[chunkhash].js" : "javascripts/[name].js",
+    chunkFilename: packingForProduction ? "javascripts/[name]_[chunkhash].js" : "javascripts/[name].js"
   },
 
   module: {
@@ -63,24 +62,10 @@ let config = {
       }
     ]
   },
+
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: ["vendor"],
-      minChunks: Infinity,
-    }),
-
-    new webpack.HashedModuleIdsPlugin(),
-
-    new WebpackChunkHash(),
-
-    // new ChunkManifestPlugin({
-    //   filename: "chunk-manifest.json",
-    //   manifestVariable: "webpackManifest",
-    //   inlineManifest: true
-    // }),
-
     new ExtractTextPlugin({ // define where to save the file
-      filename: 'stylesheets/[name]_[contenthash].css',
+      filename: packingForProduction ? 'stylesheets/[name]_[contenthash].css' : 'stylesheets/[name].css',
       allChunks: true,
     }),
 
@@ -104,5 +89,22 @@ let config = {
     }
   ]
 };
+
+// plugins we add in production packing
+if (packingForProduction) {
+  config.plugins.unshift(
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ["vendor"],
+      minChunks: Infinity,
+    }),
+    new webpack.HashedModuleIdsPlugin(),
+    new WebpackChunkHash()
+  );
+}
+else {
+  config.plugins.unshift(
+    new webpack.NamedModulesPlugin()
+  );
+}
 
 module.exports = config;
