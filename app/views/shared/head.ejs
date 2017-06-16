@@ -1,3 +1,7 @@
 <head>
-  <link rel="stylesheet" media="all" href="/stylesheets/application_css_bundle.css">
+  <link rel="stylesheet" media="all" href="<%= manifest.css.vendor %>">
+  <link rel="stylesheet" media="all" href="<%= manifest.css.application %>">
+
+  <script type="text/javascript" src="<%= manifest.js.vendor %>" defer></script>
+  <script type="text/javascript" src="<%= manifest.js.application %>" defer></script>
 </head>
